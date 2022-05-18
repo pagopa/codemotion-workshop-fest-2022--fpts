@@ -20,12 +20,13 @@ type GenericServerError = { readonly code: 500; readonly body: string };
 type SpeakerCannotSubmit = { readonly code: 403 };
 type InvalidParameters = { readonly code: 400; readonly body: string };
 
-type EndpointResponse =
-  | Success
+type EndpointfailureResponse =
   | SpeakerNotFound
   | GenericServerError
   | SpeakerCannotSubmit
   | InvalidParameters;
+
+type EndpointResponse = Success | EndpointfailureResponse;
 
 const success = (body: Submission): Success => ({ body, code: 200 });
 const speakerNotFound = (): SpeakerNotFound => ({ code: 404 });
@@ -89,29 +90,38 @@ export default (input: unknown): Promise<EndpointResponse> =>
     // validate submission
     validateSubmission,
     TE.fromEither,
-    TE.mapLeft(reason => invalidParameters(reason)),
+    TE.mapLeft(reason => invalidParameters(reason) as EndpointfailureResponse),
 
     // check if the speaker exists and is confirmed
-    TE.chainW(sub =>
+    TE.chain(sub =>
       pipe(
         TE.tryCatch(
           () => readSpeakerById(sub.speakerId),
-          _ => serverError("failed to retrieve speaker informations")
+          _ =>
+            serverError(
+              "failed to retrieve speaker informations"
+            ) as EndpointfailureResponse
         ),
 
-        TE.chainW(maybeSpeaker =>
-          pipe(maybeSpeaker, O.fromNullable, TE.fromOption(speakerNotFound))
+        TE.chain(maybeSpeaker =>
+          pipe(
+            maybeSpeaker,
+            O.fromNullable,
+            TE.fromOption(() => speakerNotFound() as EndpointfailureResponse)
+          )
         ),
 
-        TE.chainW(speaker =>
-          speaker.confirmed ? TE.right(speaker) : TE.left(speakerCannotSubmit())
+        TE.chain(speaker =>
+          speaker.confirmed
+            ? TE.right(speaker)
+            : TE.left(speakerCannotSubmit() as EndpointfailureResponse)
         ),
 
         TE.map(_ => sub)
       )
     ),
 
-    TE.chainW(sub =>
+    TE.chain(sub =>
       TE.tryCatch(
         () =>
           saveTalk({
@@ -119,7 +129,7 @@ export default (input: unknown): Promise<EndpointResponse> =>
             speakerId: sub.speakerId,
             title: sub.title
           }),
-        _ => serverError("failed to save talk")
+        _ => serverError("failed to save talk") as EndpointfailureResponse
       )
     ),
 
