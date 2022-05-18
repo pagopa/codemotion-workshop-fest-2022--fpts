@@ -20,5 +20,7 @@ module.exports = {
     sourceType: "module"
   },
   extends: ["@pagopa/eslint-config/strong"],
-  rules: {}
+  rules: {
+    "@typescript-eslint/consistent-type-definitions": ["error", "type"]
+  }
 };
