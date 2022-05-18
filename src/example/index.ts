@@ -20,13 +20,13 @@ type GenericServerError = { readonly code: 500; readonly body: string };
 type SpeakerCannotSubmit = { readonly code: 403 };
 type InvalidParameters = { readonly code: 400; readonly body: string };
 
-type EndpointfailureResponse =
+type EndpointFailureResponse =
   | SpeakerNotFound
   | GenericServerError
   | SpeakerCannotSubmit
   | InvalidParameters;
 
-type EndpointResponse = Success | EndpointfailureResponse;
+type EndpointResponse = Success | EndpointFailureResponse;
 
 const success = (body: Submission): Success => ({ body, code: 200 });
 const speakerNotFound = (): SpeakerNotFound => ({ code: 404 });
@@ -90,7 +90,7 @@ export default (input: unknown): Promise<EndpointResponse> =>
     // validate submission
     validateSubmission,
     TE.fromEither,
-    TE.mapLeft(reason => invalidParameters(reason) as EndpointfailureResponse),
+    TE.mapLeft(reason => invalidParameters(reason) as EndpointFailureResponse),
 
     // check if the speaker exists and is confirmed
     TE.chain(sub =>
@@ -100,21 +100,21 @@ export default (input: unknown): Promise<EndpointResponse> =>
           _ =>
             serverError(
               "failed to retrieve speaker informations"
-            ) as EndpointfailureResponse
+            ) as EndpointFailureResponse
         ),
 
         TE.chain(maybeSpeaker =>
           pipe(
             maybeSpeaker,
             O.fromNullable,
-            TE.fromOption(() => speakerNotFound() as EndpointfailureResponse)
+            TE.fromOption(() => speakerNotFound() as EndpointFailureResponse)
           )
         ),
 
         TE.chain(speaker =>
           speaker.confirmed
             ? TE.right(speaker)
-            : TE.left(speakerCannotSubmit() as EndpointfailureResponse)
+            : TE.left(speakerCannotSubmit() as EndpointFailureResponse)
         ),
 
         TE.map(_ => sub)
@@ -129,7 +129,7 @@ export default (input: unknown): Promise<EndpointResponse> =>
             speakerId: sub.speakerId,
             title: sub.title
           }),
-        _ => serverError("failed to save talk") as EndpointfailureResponse
+        _ => serverError("failed to save talk") as EndpointFailureResponse
       )
     ),
 
