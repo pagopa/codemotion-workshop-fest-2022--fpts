@@ -15,7 +15,7 @@ Possiamo quindi combinare Type Class i cui "innesti" sono compatibili tra loro. 
 
 TODO: immagine puzzle
 
-#### Type Class: `Option`
+### Type Class: `Option`
 Un `Option` serve ad esprimere la presenza o meno di un valore. Il caso d'uso tipico è la ricerca di un singolo elemento all'interno di una collezione, che può tornare uno o zero elementi; si usa anche per gestire parametri opzionali.
 
 Un `Option` è definito come l'unione di due tipi, `Some` e `None`, che indicano la presenza o meno del valore:
@@ -36,7 +36,7 @@ O.some(myVar) // Some<object>
 ```
 Questo approccio può andare bene quando **siamo sicuri** che il valore sia effettivamente presente. 
 
-#### Operazione: `from*`
+### Operazione: `from*`
 Un altro modo, sicuramente più solido e quindi più usato, è quello di usare l'operazione `fromNullable` che crea l'`Option` a partire da un valore arbitrario:
 ```ts
 const myVar: object;
@@ -70,7 +70,7 @@ Anche `fromNullable` può essere definito un costruttore, però aggiunge una cer
 </details>
 
 
-#### Operazione: `is*`
+### Operazione: `is*`
 Come si può utilizzare il valore contenuto dall'`Option`? Il modo più diretto è accedere all'attributo `value`, che però è definito solamente per istanze di `Some`. Occorre quindi utilizzare il [_type narrowing_  di Typescript](https://www.typescriptlang.org/docs/handbook/2/narrowing.html) per ricondurci a quel caso:
 ```ts
 const maybeFoo = O.some("foo");
@@ -91,7 +91,7 @@ Questo modo di accedere al valore contenuto lascia per strada molti dei vantaggi
 * quando si introduce `fp-ts` all'interno di una procedura scritta senza 
 * nei test, dove si predilige immediatezza ed espressività rispetto alla solidità della procedura
 
-#### Operazione: `map`
+### Operazione: `map`
 Tramite questa operazione possiamo applicare una trasformazione al valore contenuto **senza uscire dal contesto del Type Class**:
 ```ts
 const toDollar = (n: number): string => `$${n}`;
@@ -136,7 +136,7 @@ pipe(
 );
 ```
 
-#### Operazione: `chain`
+### Operazione: `chain`
 Anche `chain` applica delle trasformazioni al valore contenuto, ma a differenza di `map` può cambiare se il risultato sia istanza di `Some` o `None`. Si utilizza quando si vogliono mettere in serie due o più valori che potrebbero essere null-ish.
 ```ts
 type Product = { name: string; price: number; };
@@ -158,7 +158,7 @@ const getFinalPrice = (productId: string): Option<string> =>
   );
 ```
 
-#### Operazione: `fold`
+### Operazione: `fold`
 Con questa operazione entrambi i "rami" dell'elaborazione (`Some` e `None`) vengono collassati in un unico ramo. Il risultato può essere un valore o un altro Type Class su cui lavorare. 
 Un caso di utilizzo è quando si vuole di uscire dal contesto del Type Class per lavorare direttamente sul valore.
 ```ts
@@ -174,7 +174,7 @@ pipe(
 )
 ```
 
-#### Type Class: `Either`
+### Type Class: `Either`
 Introduciamo un nuovo Type Class su cui operare: `Either`. `Either` esprime il risultato di una computazione che può essere esclusivamente di un tipo o di un altro. In pratica divide la computazione in due rami, `Left` e `Right`; la sua definizione quindi sarà
 ```ts
 type Either<L, R> = Left<L> | Right<R>
@@ -284,7 +284,7 @@ pipe(
 );
 ```
 
-#### Type Class: `TaskEither`
+### Type Class: `TaskEither`
 `TaskEither` l'ultimo Type Class che includiamo tra gli essenziali. Rappresenta **un'operazione asincrona che può fallire** e, come si intuisce dal nome, è definito come un `Task` che ritorna un `Either`
 ```ts
 type Task<T> = () => Promise<T>
@@ -334,7 +334,7 @@ procedure().then(result => {
 });
 ```
 
-#### Sommario
+### Sommario
 
 |Type Class|Si usa per|
 |-|-|
