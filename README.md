@@ -1,8 +1,20 @@
 Code Sample supporting our workshop at [Codemotion Workshop Fest 2022](https://events.codemotion.com/conferences/online/2022/workshop-fest).
 
+# `fp-ts`: l’approccio pragmatico usato da App IO
+
+
+Agenda:
+* [`fp-ts`: cos’è e perché usarla](#fp-ts-cosè-e-perché-usarla)
+* [Tipi e operazioni essenziali](#tipi-ed-operazioni-essenziali)
+* Un caso reale: costruiamo un http endpoint
+* Conclusioni e Q&A
+
+---
+
+## `fp-ts`: cos’è e perché usarla
+Vedi slides.
 
 ## Tipi ed operazioni essenziali
-
 Facciamo una panoramica del set minimo di strumenti di cui abbiamo bisogno. Presenteremo:
 * 3 *classi di tipo* o Type Class
 * 5 operazioni
@@ -350,3 +362,9 @@ procedure().then(result => {
 |`chain`| Applicare una trasformazione al valore contenuto cambiando il sotto-tipo |
 |`fold`| Far convergere i due rami della computazione |
 
+
+## Un caso reale: costruiamo un http endpoint
+TODO
+
+## Conclusioni e Q&A
+Vedi slides
