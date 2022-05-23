@@ -4,44 +4,15 @@ import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
 import { readSpeakerById } from "./db_speakers";
 import { saveTalk } from "./db_talks";
-
-type Submission = {
-  readonly title: string;
-  readonly abstract: string;
-  readonly speakerId: string;
-};
-
-type Success = {
-  readonly code: 200;
-  readonly body: Submission;
-};
-type SpeakerNotFound = { readonly code: 404 };
-type GenericServerError = { readonly code: 500; readonly body: string };
-type SpeakerCannotSubmit = { readonly code: 403 };
-type InvalidParameters = { readonly code: 400; readonly body: string };
-
-type EndpointFailureResponse =
-  | SpeakerNotFound
-  | GenericServerError
-  | SpeakerCannotSubmit
-  | InvalidParameters;
-
-type EndpointResponse = Success | EndpointFailureResponse;
-
-const success = (body: Submission): EndpointResponse => ({
-  body,
-  code: 200
-});
-const speakerNotFound = (): EndpointResponse => ({ code: 404 });
-const serverError = (reason: string): EndpointResponse => ({
-  body: reason,
-  code: 500
-});
-const invalidParameters = (reason: string): EndpointResponse => ({
-  body: reason,
-  code: 400
-});
-const speakerCannotSubmit = (): EndpointResponse => ({ code: 403 });
+import {
+  Submission,
+  invalidParameters,
+  serverError,
+  speakerNotFound,
+  speakerCannotSubmit,
+  EndpointResponse,
+  success
+} from "./types";
 
 type SubmissionValidationFailure =
   | "bad-payload-format"
