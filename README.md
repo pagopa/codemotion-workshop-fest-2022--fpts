@@ -364,7 +364,66 @@ procedure().then(result => {
 
 
 ## Un caso reale: costruiamo un http endpoint
-TODO
+
+### Scenario
+> Esporre un endpoint che permetta di sottomettere un Talk per uno Speaker. 
+>
+> Il Talk deve avere un titolo lungo tra i 30 e i 70 caratteri e una descrizione di massimo 3000 caratteri.
+>
+> Un Talk deve far riferimento ad uno Speaker già registrato e confermato.
+
+<details>
+  <summary>Specifica OpenAPI</summary>
+
+  ```yaml
+  openapi: 3.0.3
+  info:
+    title: Example
+    version: 0.1.0
+  paths:
+    /talks:
+      post:
+        operationId: SubmitTalk
+        responses:
+          200:
+            description: Submission accepted
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Submission"
+          400:
+            description: Invalid parameters
+            content:
+              text/plain:
+                schema:
+                  type: string
+          403:
+            description: Speaker not confimed
+          404:
+            description: Speaker not found
+          500:
+            description: Server Error
+            content:
+              text/plain:
+                schema:
+                  type: string
+  components:
+    schemas:
+      Submission:
+        type: object
+        properties:
+          title:
+            type: string
+          abstract:
+            type: string
+          speakerId:
+            type: string
+  ```
+</details>
+
+### Flowchart
+![Il flowchart che definisce l'endpoint](docs/ednpoint_flow.png)
+
 
 ## Conclusioni e Q&A
 Vedi slides
