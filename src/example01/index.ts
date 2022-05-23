@@ -28,17 +28,20 @@ type EndpointFailureResponse =
 
 type EndpointResponse = Success | EndpointFailureResponse;
 
-const success = (body: Submission): Success => ({ body, code: 200 });
-const speakerNotFound = (): SpeakerNotFound => ({ code: 404 });
-const serverError = (reason: string): GenericServerError => ({
+const success = (body: Submission): EndpointResponse => ({
+  body,
+  code: 200
+});
+const speakerNotFound = (): EndpointResponse => ({ code: 404 });
+const serverError = (reason: string): EndpointResponse => ({
   body: reason,
   code: 500
 });
-const invalidParameters = (reason: string): InvalidParameters => ({
+const invalidParameters = (reason: string): EndpointResponse => ({
   body: reason,
   code: 400
 });
-const speakerCannotSubmit = (): SpeakerCannotSubmit => ({ code: 403 });
+const speakerCannotSubmit = (): EndpointResponse => ({ code: 403 });
 
 type SubmissionValidationFailure =
   | "bad-payload-format"
@@ -90,31 +93,26 @@ export default (input: unknown): Promise<EndpointResponse> =>
     // validate submission
     validateSubmission,
     TE.fromEither,
-    TE.mapLeft(reason => invalidParameters(reason) as EndpointFailureResponse),
+    TE.mapLeft(reason => invalidParameters(reason)),
 
     // check if the speaker exists and is confirmed
     TE.chain(sub =>
       pipe(
         TE.tryCatch(
           () => readSpeakerById(sub.speakerId),
-          _ =>
-            serverError(
-              "failed to retrieve speaker informations"
-            ) as EndpointFailureResponse
+          _ => serverError("failed to retrieve speaker informations")
         ),
 
         TE.chain(maybeSpeaker =>
           pipe(
             maybeSpeaker,
             O.fromNullable,
-            TE.fromOption(() => speakerNotFound() as EndpointFailureResponse)
+            TE.fromOption(() => speakerNotFound())
           )
         ),
 
         TE.chain(speaker =>
-          speaker.confirmed
-            ? TE.right(speaker)
-            : TE.left(speakerCannotSubmit() as EndpointFailureResponse)
+          speaker.confirmed ? TE.right(speaker) : TE.left(speakerCannotSubmit())
         ),
 
         TE.map(_ => sub)
@@ -129,7 +127,7 @@ export default (input: unknown): Promise<EndpointResponse> =>
             speakerId: sub.speakerId,
             title: sub.title
           }),
-        _ => serverError("failed to save talk") as EndpointFailureResponse
+        _ => serverError("failed to save talk")
       )
     ),
 
