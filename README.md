@@ -6,8 +6,8 @@ Code Sample supporting our workshop at [Codemotion Workshop Fest 2022](https://e
 Agenda:
 * [`fp-ts`: cos’è e perché usarla](#fp-ts-cosè-e-perché-usarla)
 * [Tipi e operazioni essenziali](#tipi-ed-operazioni-essenziali)
-* Un caso reale: costruiamo un http endpoint
-* Conclusioni e Q&A
+* [Un caso reale: costruiamo un http endpoint](#un-caso-reale-costruiamo-un-http-endpoint)
+* [Conclusioni e Q&A](#conclusioni-e-qa)
 
 ---
 
