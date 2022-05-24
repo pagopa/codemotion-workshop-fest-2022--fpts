@@ -15,18 +15,21 @@ Agenda:
   
   ```bash
   npm ci
+  # oppure
   yarn install --frozen-lockfile
   ```
 
   Build:
   ```bash
   npm run build
+  # oppure
   yarn build
   ```
 
   Eseguire l'esempio: 
   ```bash
   npm run example01
+  # oppure
   yarn example01
   ```
 </details>
