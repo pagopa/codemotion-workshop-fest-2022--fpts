@@ -73,7 +73,6 @@ export default (input: unknown): Promise<EndpointResponse> =>
           () => readSpeakerById(sub.speakerId),
           _ => serverError("failed to retrieve speaker informations")
         ),
-
         TE.chain(maybeSpeaker =>
           pipe(
             maybeSpeaker,
@@ -81,11 +80,9 @@ export default (input: unknown): Promise<EndpointResponse> =>
             TE.fromOption(() => speakerNotFound())
           )
         ),
-
         TE.chain(speaker =>
           speaker.confirmed ? TE.right(speaker) : TE.left(speakerCannotSubmit())
         ),
-
         TE.map(_ => sub)
       )
     ),

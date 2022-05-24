@@ -52,7 +52,6 @@ Possiamo immaginare un Data Type come una scatola che contiene il valore che sti
 Si può immaginare un Data Type come le forme dei pezzi di un puzzle: gli "innesti" sono determinati sia dal Data Type stesso che dal tipo del valore contenuto.
 Possiamo quindi combinare Data Type i cui "innesti" sono compatibili tra loro. Inoltre **siamo obbligati ad utilizzare tutti gli "innesti"** esposti da un Data Type.
 
-TODO: immagine puzzle
 
 ### Data Type: `Option`
 Un `Option` serve ad esprimere la presenza o meno di un valore. Il caso d'uso tipico è la ricerca di un singolo elemento all'interno di una collezione, che può tornare uno o zero elementi; si usa anche per gestire parametri opzionali.
