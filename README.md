@@ -16,18 +16,18 @@ Vedi slides.
 
 ## Tipi ed operazioni essenziali
 Facciamo una panoramica del set minimo di strumenti di cui abbiamo bisogno. Presenteremo:
-* 3 *classi di tipo* o Type Class
+* 3 Data Type
 * 5 operazioni
 
-### Che cos'è un Type Class?
-Possiamo immaginare un Type Class come una scatola che contiene il valore che stiamo elaborando. Implementa le regole algebriche che ne determinano la componibilità, quindi le caratteristiche con cui il nostro valore può essere combinato con altri oggetti.
+### Che cos'è un Data Type in `fp-ts`?
+Possiamo immaginare un Data Type come una scatola che contiene il valore che stiamo elaborando. Implementa le regole algebriche che ne determinano la componibilità, quindi le caratteristiche con cui il nostro valore può essere combinato con altri oggetti.
 
-Si può immaginare un Type Class come le forme dei pezzi di un puzzle: gli "innesti" sono determinati sia dal Type Class stesso che dal tipo del valore contenuto.
-Possiamo quindi combinare Type Class i cui "innesti" sono compatibili tra loro. Inoltre **siamo obbligati ad utilizzare tutti gli "innesti"** esposti da un Type Class.
+Si può immaginare un Data Type come le forme dei pezzi di un puzzle: gli "innesti" sono determinati sia dal Data Type stesso che dal tipo del valore contenuto.
+Possiamo quindi combinare Data Type i cui "innesti" sono compatibili tra loro. Inoltre **siamo obbligati ad utilizzare tutti gli "innesti"** esposti da un Data Type.
 
 TODO: immagine puzzle
 
-### Type Class: `Option`
+### Data Type: `Option`
 Un `Option` serve ad esprimere la presenza o meno di un valore. Il caso d'uso tipico è la ricerca di un singolo elemento all'interno di una collezione, che può tornare uno o zero elementi; si usa anche per gestire parametri opzionali.
 
 Un `Option` è definito come l'unione di due tipi, `Some` e `None`, che indicano la presenza o meno del valore:
@@ -59,9 +59,9 @@ Anche `fromNullable` può essere definito un costruttore, però aggiunge una cer
 
 <details>
   <summary>Moduli e convenzioni di sintassi</summary>
-  Ad ogni Type Class corrisponde un modulo omonimo contenente i metodi e i tipi associati.
+  Ad ogni Data Type corrisponde un modulo omonimo contenente i metodi e i tipi associati.
 
-  In questa esposizione riproponiamo la convenzione che abbiamo usato in tutta la nostra codebase: importiamo tutti i metodi e gli attributi del modulo in una variabile che l'iniziale maiuscola del Type Class. Quindi:
+  In questa esposizione riproponiamo la convenzione che abbiamo usato in tutta la nostra codebase: importiamo tutti i metodi e gli attributi del modulo in una variabile che l'iniziale maiuscola del Data Type. Quindi:
   ```ts
   import * as O from "fp-ts/Option";
   import * as E from "fp-ts/Either";
@@ -97,14 +97,14 @@ if (O.isSome(maybeFoo)) {
   //            ^^^^ Build error: value non è definito per None
 }
 ```
-Le funzioni `isSome` e `isNone` sono delle _type guard_, `fp-ts` ne mette a disposizione diverse a seconda del contesto e del Type Class. Le raggruppiamo nella categoria `is*`.
+Le funzioni `isSome` e `isNone` sono delle _type guard_, `fp-ts` ne mette a disposizione diverse a seconda del contesto e del Data Type. Le raggruppiamo nella categoria `is*`.
 
-Questo modo di accedere al valore contenuto lascia per strada molti dei vantaggi di usare un Type Class e quindi tendiamo ad evitare di usarlo. Tuttavia ha i suoi casi d'uso:
+Questo modo di accedere al valore contenuto lascia per strada molti dei vantaggi di usare un Data Type e quindi tendiamo ad evitare di usarlo. Tuttavia ha i suoi casi d'uso:
 * quando si introduce `fp-ts` all'interno di una procedura scritta senza 
 * nei test, dove si predilige immediatezza ed espressività rispetto alla solidità della procedura
 
 ### Operazione: `map`
-Tramite questa operazione possiamo applicare una trasformazione al valore contenuto **senza uscire dal contesto del Type Class**:
+Tramite questa operazione possiamo applicare una trasformazione al valore contenuto **senza uscire dal contesto del Data Type**:
 ```ts
 const toDollar = (n: number): string => `$${n}`;
 const toMaybeDollar = O.map(toDollar); // "eleva" toDollar per funzionare con Option
@@ -113,7 +113,7 @@ toMaybeDollar(O.some(42)); // Option<string>
 toMaybeDollar(O.none); // Option<string>
 ```
 La funzione `toDollar` viene eseguita solo per istanza di `Some` e ignorata per istanze `None`. 
-`toMaybeDollar` invece è una funzione che accetta un'istanza di `Option` e ne crea un'altra contenente il nuovo valore. È importante notare che la nuova istanza sarà a sua volta istanza di `Some` e di `None` a seconda che l'`Option` di partenza fosse rispettivamente un `Some` o un `None`. In termini pratici, **map conserva sia il Type Class che il tipo "base"**.
+`toMaybeDollar` invece è una funzione che accetta un'istanza di `Option` e ne crea un'altra contenente il nuovo valore. È importante notare che la nuova istanza sarà a sua volta istanza di `Some` e di `None` a seconda che l'`Option` di partenza fosse rispettivamente un `Some` o un `None`. In termini pratici, **map conserva sia il Data Type che il tipo "base"**.
 
 La sintassi usata può essere migliorata con l'utility `pipe`:
 ```ts
@@ -171,8 +171,8 @@ const getFinalPrice = (productId: string): Option<string> =>
 ```
 
 ### Operazione: `fold`
-Con questa operazione entrambi i "rami" dell'elaborazione (`Some` e `None`) vengono collassati in un unico ramo. Il risultato può essere un valore o un altro Type Class su cui lavorare. 
-Un caso di utilizzo è quando si vuole di uscire dal contesto del Type Class per lavorare direttamente sul valore.
+Con questa operazione entrambi i "rami" dell'elaborazione (`Some` e `None`) vengono collassati in un unico ramo. Il risultato può essere un valore o un altro Data Type su cui lavorare. 
+Un caso di utilizzo è quando si vuole di uscire dal contesto del Data Type per lavorare direttamente sul valore.
 ```ts
 
 pipe(
@@ -186,8 +186,8 @@ pipe(
 )
 ```
 
-### Type Class: `Either`
-Introduciamo un nuovo Type Class su cui operare: `Either`. `Either` esprime il risultato di una computazione che può essere esclusivamente di un tipo o di un altro. In pratica divide la computazione in due rami, `Left` e `Right`; la sua definizione quindi sarà
+### Data Type: `Either`
+Introduciamo un nuovo Data Type su cui operare: `Either`. `Either` esprime il risultato di una computazione che può essere esclusivamente di un tipo o di un altro. In pratica divide la computazione in due rami, `Left` e `Right`; la sua definizione quindi sarà
 ```ts
 type Either<L, R> = Left<L> | Right<R>
 ``` 
@@ -296,8 +296,8 @@ pipe(
 );
 ```
 
-### Type Class: `TaskEither`
-`TaskEither` l'ultimo Type Class che includiamo tra gli essenziali. Rappresenta **un'operazione asincrona che può fallire** e, come si intuisce dal nome, è definito come un `Task` che ritorna un `Either`
+### Data Type: `TaskEither`
+`TaskEither` l'ultimo Data Type che includiamo tra gli essenziali. Rappresenta **un'operazione asincrona che può fallire** e, come si intuisce dal nome, è definito come un `Task` che ritorna un `Either`
 ```ts
 type Task<T> = () => Promise<T>
 
@@ -348,7 +348,7 @@ procedure().then(result => {
 
 ### Sommario
 
-|Type Class|Si usa per|
+|Data Type|Si usa per|
 |-|-|
 |`Option`| Un valore che c'è o è null-ish|
 |`Either`| Validazione, operazione che può fallire |
@@ -357,7 +357,7 @@ procedure().then(result => {
 |Operazione|Si usa per|
 |-|-|
 |`is*`| _type narrowing_ di un TypeClass in un sotto-tipo|
-|`from*`| Costruire un Type Class a partire da un valore o un altro Type Class |
+|`from*`| Costruire un Data Type a partire da un valore o un altro Data Type |
 |`map`| Applicare una trasformazione al valore contenuto senza cambiare il sotto-tipo |
 |`chain`| Applicare una trasformazione al valore contenuto cambiando il sotto-tipo |
 |`fold`| Far convergere i due rami della computazione |
