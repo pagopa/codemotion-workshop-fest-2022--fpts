@@ -9,6 +9,27 @@ Agenda:
 * [Un caso reale: costruiamo un http endpoint](#un-caso-reale-costruiamo-un-http-endpoint)
 * [Conclusioni e Q&A](#conclusioni-e-qa)
 
+<details>
+  <summary>Istruzioni</summary>
+  Gli esempi sono pensati per funzionare con Node.js 14. Per installare le dipendenze si può usare sia `npm` che `yarn`
+  ```bash
+  npm ci
+  yarn install --frozen-lockfile
+  ```
+
+  Build:
+  ```bash
+  npm run build
+  yarn build
+  ```
+
+  Eseguire l'esempio: 
+  ```bash
+  npm run example01
+  yarn example01
+  ```
+</details>
+
 ---
 
 ## `fp-ts`: cos’è e perché usarla

@@ -8,7 +8,6 @@
   "scripts": {
     "build": "tsc",
     "example01": "node dist/example01/server.js",
-    "test": "jest",
     "lint": "eslint . -c .eslintrc.js --ext .ts,.tsx"
   },
   "devDependencies": {
