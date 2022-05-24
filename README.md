@@ -40,6 +40,8 @@ Agenda:
 Vedi slides.
 
 ## Tipi ed operazioni essenziali
+> *Gli esempi sono riportati in [src/walkthroughs](src/walkthroughs;)*
+
 Facciamo una panoramica del set minimo di strumenti di cui abbiamo bisogno. Presenteremo:
 * 3 Data Type
 * 5 operazioni
@@ -147,7 +149,7 @@ const toEuro = (n: number): string => `$${n}`;
 const result = pipe(
   42,
   O.some,
-  O.map(toEuro)
+  O.map(toEuro),
   O.map(value => {
     console.log(value); // "€42"
   })
@@ -179,10 +181,10 @@ Anche `chain` applica delle trasformazioni al valore contenuto, ma a differenza 
 type Product = { name: string; price: number; };
 const products = new Map<string, Product>();
 
-const getFinalPrice = (productId: string): Option<string> =>
+const getFinalPrice = (productId: string): O.Option<string> =>
   pipe(
     productId,
-    O.fromNullable,
+    O.fromPredicate(s => s.length > 0), // Un altro smart constructor!
     O.chain(id => {
         const product = products.get(id);
         return product ? O.some(product) : O.none;
@@ -227,7 +229,7 @@ import * as E from "fp-ts/Either";
 E.right(42);
 E.left("not 42");
 
-const validatePrice = (price: number): Either<string, number> =>
+const validatePrice = (price: number): E.Either<string, number> =>
     price >= 0
         ? E.right(price)
         : E.left("price cannot be negative")
@@ -252,7 +254,7 @@ E.tryCatch(
 
 Anche su `Either` sono definite le operazioni `is*`, `map`, `chain` e `fold`:
 ```ts
-const fooOrError = E.some("foo");
+const fooOrError = E.right("foo");
 
 if (E.isRight(fooOrError)) {
   console.log(fooOrError.right);
@@ -264,7 +266,7 @@ if (E.isRight(fooOrError)) {
   //            ^^^^ Build error: right è definito per Left
 }
 
-const checkMinPrice = (price: number): Either<string, number> =>
+const checkMinPrice = (price: number): E.Either<string, number> =>
   price >= 10 // arbitrary treshold, just an example
     ? E.right(price)
     : E.left("price cannot be less than 10");
@@ -272,14 +274,22 @@ const checkMinPrice = (price: number): Either<string, number> =>
 pipe(
   price,
   validatePrice,
-  E.map(applyDiscount),
+  E.map(applyDiscount(23)),
   E.chain(checkMinPrice),
-  E.fold(
+  E.foldW(
     reason => new Error(reason),
     toEuro
   )
 )
 ```
+<details>
+  <summary>Perché `foldW`?</summary>
+  Perché il tipo tornato dal caso left è diverso dal caso right.
+  `W` sta per Wide, ovvero "allarga" il tipo per accogliere entrambi.
+  In pratica: una union.
+</details>;
+
+
 
 Un particolarità di `Either` rispetto ad `Option` è la presenza di `mapLeft`: stesso concetto di `map` ma applicato al ramo negativo. Si usa molto spesso per mappare gli errori su tipi coerenti a tutta la pipe:
 ```ts
@@ -339,7 +349,7 @@ TE.left("not 42");
 
 TE.tryCatch(
   () => Promise.resolve(42),
-  failure => new Error(failure)
+  failure => new Error("unknown failure")
 );
 
 const processPayment = async (price: number) => {
@@ -347,9 +357,9 @@ const processPayment = async (price: number) => {
 }
 
 const procedure = pipe(
-  price,
+  myPrice,
   validatePrice,
-  E.map(applyDiscount),
+  E.map(applyDiscount(30)),
   E.chain(checkMinPrice),
   TE.fromEither,
   TE.chain(actualPrice =>
@@ -358,13 +368,13 @@ const procedure = pipe(
       err => "è successo qualcosa durante il pagamento"
     )
   ),
-  TE.map("OK"),
+  TE.map(_ => "OK"),
+  // questo fold è sostituito da TE.toUnion
   TE.fold(
-    _ => _,
-    _ => _
+    _ => async () => _,
+    _ => async () => _
   )
 );
-
 
 procedure().then(result => {
     console.log(result)
