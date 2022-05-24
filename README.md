@@ -12,6 +12,7 @@ Agenda:
 <details>
   <summary>Istruzioni</summary>
   Gli esempi sono pensati per funzionare con Node.js 14. Per installare le dipendenze si può usare sia `npm` che `yarn`
+  
   ```bash
   npm ci
   yarn install --frozen-lockfile
@@ -61,10 +62,10 @@ Il modo più elementare di costruire un `Option` è usare gli appositi costrutto
 ```ts
 import * as O from "fp-ts/Option";
 
-O.some(42) // Some<number>
-O.none // None
+O.some(42) // Option<number>
+O.none // Option<never>
 const myVar: object;
-O.some(myVar) // Some<object>
+O.some(myVar) // Option<object>
 //     ^^^^^ può essere null!!
 ```
 Questo approccio può andare bene quando **siamo sicuri** che il valore sia effettivamente presente. 
@@ -127,25 +128,25 @@ Questo modo di accedere al valore contenuto lascia per strada molti dei vantaggi
 ### Operazione: `map`
 Tramite questa operazione possiamo applicare una trasformazione al valore contenuto **senza uscire dal contesto del Data Type**:
 ```ts
-const toDollar = (n: number): string => `$${n}`;
-const toMaybeDollar = O.map(toDollar); // "eleva" toDollar per funzionare con Option
+const toEuro = (n: number): string => `€${n}`;
+const toMaybeDollar = O.map(toEuro); // "eleva" toEuro per funzionare con Option
 
 toMaybeDollar(O.some(42)); // Option<string>
 toMaybeDollar(O.none); // Option<string>
 ```
-La funzione `toDollar` viene eseguita solo per istanza di `Some` e ignorata per istanze `None`. 
+La funzione `toEuro` viene eseguita solo per istanza di `Some` e ignorata per istanze `None`. 
 `toMaybeDollar` invece è una funzione che accetta un'istanza di `Option` e ne crea un'altra contenente il nuovo valore. È importante notare che la nuova istanza sarà a sua volta istanza di `Some` e di `None` a seconda che l'`Option` di partenza fosse rispettivamente un `Some` o un `None`. In termini pratici, **map conserva sia il Data Type che il tipo "base"**.
 
 La sintassi usata può essere migliorata con l'utility `pipe`:
 ```ts
-const toDollar = (n: number): string => `$${n}`;
+const toEuro = (n: number): string => `$${n}`;
 
 const result = pipe(
   42,
   O.some,
-  O.map(toDollar)
+  O.map(toEuro)
   O.map(value => {
-    console.log(value); // "$42"
+    console.log(value); // "€42"
   })
 ); 
 // Domanda: qual è il tipo di result?
@@ -158,14 +159,14 @@ const applyDiscount = (perc: number) =>
   (n: number): number => n * (1 - perc / 100);
 const toRounded = (digits: number) =>
   (n: number): number => Math.round(n * 10 ** digits) / 10 ** digits;
-const toDollar = (n: number): string => `$${n}`;
+const toEuro = (n: number): string => `$${n}`;
 
 pipe(
   myPrice,
   O.fromNullable,
   O.map(applyDiscount(35)),
   O.map(toRounded(2)),
-  O.map(toDollar)
+  O.map(toEuro)
 );
 ```
 
@@ -187,7 +188,7 @@ const getFinalPrice = (productId: string): Option<string> =>
     O.map(product => product.price),
     O.map(applyDiscount(35)),
     O.map(toRounded(2)),
-    O.map(toDollar)
+    O.map(toEuro)
   );
 ```
 
@@ -272,7 +273,7 @@ pipe(
   E.chain(checkMinPrice),
   E.fold(
     reason => new Error(reason),
-    toDollar
+    toEuro
   )
 )
 ```
