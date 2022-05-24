@@ -424,6 +424,56 @@ procedure().then(result => {
 ### Flowchart
 ![Il flowchart che definisce l'endpoint](docs/ednpoint_flow.png)
 
+### Codice
+```ts
+export default (input: unknown): Promise<EndpointResponse> =>
+  pipe(
+    input,
+    // validate submission
+    validateSubmission,
+    TE.fromEither,
+    TE.mapLeft(reason => invalidParameters(reason)),
+
+    // check if the speaker exists and is confirmed
+    TE.chain(sub =>
+      pipe(
+        TE.tryCatch(
+          () => readSpeakerById(sub.speakerId),
+          _ => serverError("failed to retrieve speaker informations")
+        ),
+
+        TE.chain(maybeSpeaker =>
+          pipe(
+            maybeSpeaker,
+            O.fromNullable,
+            TE.fromOption(() => speakerNotFound())
+          )
+        ),
+
+        TE.chain(speaker =>
+          speaker.confirmed ? TE.right(speaker) : TE.left(speakerCannotSubmit())
+        ),
+
+        TE.map(_ => sub)
+      )
+    ),
+
+    TE.chain(sub =>
+      TE.tryCatch(
+        () =>
+          saveTalk({
+            abstract: sub.abstract,
+            speakerId: sub.speakerId,
+            title: sub.title
+          }),
+        _ => serverError("failed to save talk")
+      )
+    ),
+
+    TE.map(sub => success(sub)),
+    TE.toUnion
+  )();
+```
 
 ## Conclusioni e Q&A
 Vedi slides
