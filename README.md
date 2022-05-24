@@ -37,7 +37,7 @@ Agenda:
 ---
 
 ## `fp-ts`: cos’è e perché usarla
-Vedi slides.
+[Vedi slides](docs/slides.pptx).
 
 ## Tipi ed operazioni essenziali
 > *Gli esempi sono riportati in [src/walkthroughs](src/walkthroughs;)*
@@ -511,4 +511,4 @@ export default (input: unknown): Promise<EndpointResponse> =>
 ```
 
 ## Conclusioni e Q&A
-Vedi slides
+[Vedi slides](docs/slides.pptx)
