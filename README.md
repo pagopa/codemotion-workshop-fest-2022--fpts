@@ -132,13 +132,13 @@ Questo modo di accedere al valore contenuto lascia per strada molti dei vantaggi
 Tramite questa operazione possiamo applicare una trasformazione al valore contenuto **senza uscire dal contesto del Data Type**:
 ```ts
 const toEuro = (n: number): string => `€${n}`;
-const toMaybeDollar = O.map(toEuro); // "eleva" toEuro per funzionare con Option
+const toMaybeEuro = O.map(toEuro); // "eleva" toEuro per funzionare con Option
 
-toMaybeDollar(O.some(42)); // Option<string>
-toMaybeDollar(O.none); // Option<string>
+toMaybeEuro(O.some(42)); // Option<string>
+toMaybeEuro(O.none); // Option<string>
 ```
 La funzione `toEuro` viene eseguita solo per istanza di `Some` e ignorata per istanze `None`. 
-`toMaybeDollar` invece è una funzione che accetta un'istanza di `Option` e ne crea un'altra contenente il nuovo valore. È importante notare che la nuova istanza sarà a sua volta istanza di `Some` e di `None` a seconda che l'`Option` di partenza fosse rispettivamente un `Some` o un `None`. In termini pratici, **map conserva sia il Data Type che il tipo "base"**.
+`toMaybeEuro` invece è una funzione che accetta un'istanza di `Option` e ne crea un'altra contenente il nuovo valore. È importante notare che la nuova istanza sarà a sua volta istanza di `Some` e di `None` a seconda che l'`Option` di partenza fosse rispettivamente un `Some` o un `None`. In termini pratici, **map conserva sia il Data Type che il tipo "base"**.
 
 La sintassi usata può essere migliorata con l'utility `pipe`:
 ```ts
